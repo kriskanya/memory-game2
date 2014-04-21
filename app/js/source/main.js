@@ -1,108 +1,156 @@
 (function(){
-  'use strict';
+'use strict';
+// var pair;
 
-  var images = ['blastoise', 'charizard', 'electrode', 'gengar', 'mew', 'muk', 'pikachu', 'scyther', 'venasaur', 'zubat'];
-  console.log(images);
-
-
-  //var select;
-  var clock;
-  var timer;
-  var clone = images.slice(0);
-  for(var i = 0; i < clone.length; i++){
-    images.push(clone[i]);
-  }
+var images = ['blastoise', 'charizard', 'electrode', 'gengar', 'mew', 'muk', 'pikachu', 'scyther', 'venasaur', 'zubat'];
+var clock;
+var timer;
+var $matches = [];
 
 
-  $(document).ready(init);
+var clone = images.slice(0);
+console.log(clone);
+for(var i = 0; i<10; i++){
+ images.push(clone[i]);
+}
 
-  function init(){
-    $('#start').click(start);
-    $('.box').click(boardClick);
 
-  }
 
-  function shuffleImages(images) {
-    for (var i = images.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = images[i];
-        images[i] = images[j];
-        images[j] = temp;
-    }
-        return images;
-  }
+$(document).ready(init);
 
-  function srcImages(){
 
-    var $td = $('#game > tbody > tr > td');
+function init(){
 
-  for (var i = 0; i < images.length; i++){
-    var pokemon = images[i];
-    var $img = $('<img>');
-    $img.attr('src', './media/' + pokemon + '.jpg');
-    $td.addClass('hidden');
-    $($td[i]).append($img);
-    }
+ $('#start').click(start);
+
+$('#game td').click(check);
 
 }
 
-  /*  function compare(one, two){
-      var pair = [];
-      pair.push(select);
-      var one = pair[0];
-      var two = pair[1];
-      if ( one === two){
-        $(one).addClass('freeze');
-        $(two).addClass('freeze');
-      } */
+function start(){
+ randomImage();
+ populate();
+   clearInterval(timer);
+   clock = $('#clock').data('time') * 1;
+   timer = setInterval(updateClock, 1000);
+ }
 
 
 
-   function boardClick(){
-    var select = $(this);
-    $(this).toggleClass('hidden');
+ function updateClock(){
+   clock--;
 
-  //  compare();
-    reHide(select);
-
-  }
-
-  function reHide(image){
-    setTimeout(function(){
-    image.toggleClass('hidden');
-    },500);
-  }
-
-  function countdown(){
-    clock--;
-
-    if(clock > 0 && clock < 10) {
-      warning();
-    } else if (!clock){
-      clearInterval(timer);
-      //results();
-    }
-
-    $('#clock').text(clock);
-
+   if(clock > 0 && clock < 10){
+     warning();
+   }else if(!clock){
+     checkWin();
+     clearInterval(timer);
    }
+      $('#clock').text(clock);
+ }
+
 
 
  function warning(){
-   $('clock').css('color', 'red');
+   var opacity = $('body').css('opacity') * 1;
+   opacity -= 0.1;
+   $('body').css('opacity', opacity);
+ }
 
-  }
-
-  function start(){
-    clearInterval(timer);
-    clock = $('#clock').data('time') * 1;
-    timer = setInterval(countdown, 1000);
-    shuffleImages(images);
-    console.log(images);
-    srcImages();
+function populate() {
+ var $tds = $('#game > tbody > tr > td');
 
 
-  }
+ for (var i = 0; i < images.length; i++){
+    var pokemon = images[i];
+    var $img = $('<img>');
+    $img.attr('src','./media/' + pokemon + '.jpg');
+    $tds.addClass('opacity');
+    $($tds[i]).append($img);
+ }
+
+}
+
+function randomImage(){
+ var i = images.length, j, temp;
+ while (--i) {
+   j = Math.floor( Math.random() * (i - 1) );
+     temp = images[i];
+     images[i] = images[j];
+     images[j] = temp;
+ }
+}
+
+
+ function check() {
+   $(this).addClass('reveal');
+
+      $matches = $('.reveal');
+
+       if($matches.length === 2){
+         var td1 = $matches[0];
+
+         var td2 = $matches[1];
+
+         var img1 = $(td1).children().attr('src');
+         var img2 = $(td2).children().attr('src');
+
+
+         if(img1 === img2){
+           $matches.addClass('frozen');
+           $matches.off('click');
+         }
+
+           // setTimeout(function(){
+           //   $(td1).removeClass('reveal');
+           //   $(td2).removeClass('reveal');
+           //   // $matches.removeClass('reveal');
+           // }, 1000);
+
+
+         setTimeout(function(){
+           $matches.removeClass('reveal');
+           $matches.addClass('table');
+           $matches = [];
+         }, 1000);
+
+
+         if($('.frozen').length === 20){
+           alert('Winner Winner Chicken Dinner!');
+         }
+       }
+
+
+ }
+
+
+ function checkWin() {
+   if($('.frozen').length === 20){
+     alert('Winner Winner Chicken Dinner!');
+   }
+     if($('.frozen').length < 20){
+       alert('LOSER!!!');
+     }
+ }
+
+   // var $first = pair[0];
+   // var $second = pair[1];
+   //
+   // var src1 = $($first).attr('src');
+   // var src2 = $($second).attr('src');
+   //
+   // if(src1 === src2){
+   //   $($first).addClass('frozen');
+   //   $($second).addClass('frozen');
+   //
+   //   $('img.frozen').off('click');
+   // }
+
+
+
+
+
+
 
 
 
